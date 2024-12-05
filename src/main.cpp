@@ -140,28 +140,30 @@ void auton3(){
 	chassis.moveToPose(22.577, 4.962, 180, 3000);
 }
 void auton4(){
-	//Right Side Red
+	//left Side Red
+  chassis.setPose(-62, 22, 270);
+
 		static pros::adi::DigitalOut clamp('A');
     clamp.set_value(false);
-    chassis.moveToPoint(0, 0, 1500);
-    chassis.moveToPoint(0, -39.095, 1050, {.forwards = false});
-    chassis.turnToHeading(315, 450);
-    pros::delay(20);
-    chassis.moveToPoint(8.793, -44.79, 1200, {.forwards = false});
-    pros::delay(670);
-    clamp.set_value(true);
-    chassis.turnToHeading(90, 600);
-    chassis.moveToPoint(19.5, -38.898, 1200);
-    intake.move_voltage(12000);
-    pros::delay(1000);
-    chassis.turnToHeading(0, 600);
-    chassis.moveToPoint(21.481, -13.598, 1200);
-    chassis.turnToHeading(180, 600);
-    pros::delay(800);
-    clamp.set_value(false);
-    chassis.moveToPoint(23.314, -17.952, 1500, {.forwards = false});
-    pros::delay(750);
-    clamp.set_value(true);
+chassis.moveToPose(-62, 22, 270, 3000);
+chassis.moveToPose(-32, 24, 270, 3000, {.forwards = false, .maxSpeed= 50});
+chassis.moveToPose(-24, 47, 0, 3000);
+	clamp.set_value(true);
+	intake.move(127);
+	pros::delay(1000);
+chassis.moveToPose(-8, 50, 90, 3000);
+	intake.move(-127);
+	pros::delay(500);
+	intake.move(127);
+chassis.moveToPose(-18, 45, 90, 3000, {.forwards = false});
+	intake.move(127);
+chassis.moveToPose(-8, 42, 90, 3000);
+	intake.move(127);
+	pros::delay(1000);
+chassis.moveToPose(-22, 5, 180, 3000);
+
+
+
 }
 //ao9wdeiuhfauwehfg
 //aiuwehgijshwrg
