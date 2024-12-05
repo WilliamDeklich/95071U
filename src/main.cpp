@@ -286,7 +286,7 @@ void setclamp() {
  */
 
 void opcontrol() {
-
+auton4();
 //pros::delay(10000);
 	//rotation.reset_position();
 	//rotation.reset();
