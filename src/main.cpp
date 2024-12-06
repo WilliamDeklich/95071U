@@ -147,20 +147,22 @@ void auton4(){
     clamp.set_value(false);
 chassis.moveToPose(-62, 22, 270, 3000);
 chassis.moveToPose(-32, 24, 270, 3000, {.forwards = false, .maxSpeed= 50});
-chassis.moveToPose(-24, 47, 0, 3000);
-	clamp.set_value(true);
+	pros::delay(1000);
+	intake.move(127);	
+  clamp.set_value(true);
+chassis.moveToPose(-35, 47, 0, 3000);
 	intake.move(127);
 	pros::delay(1000);
-chassis.moveToPose(-8, 50, 90, 3000);
-	intake.move(-127);
+chassis.moveToPose(-18, 53, 90, 3000);
 	pros::delay(500);
 	intake.move(127);
-chassis.moveToPose(-18, 45, 90, 3000, {.forwards = false});
+  pros::delay(1000);
+chassis.moveToPose(-30, 53, 90, 3000, {.forwards = false});
 	intake.move(127);
-chassis.moveToPose(-8, 42, 90, 3000);
+chassis.moveToPose(-18, 42, 90, 3000);
 	intake.move(127);
 	pros::delay(1000);
-chassis.moveToPose(-22, 5, 180, 3000);
+//chassis.moveToPose(-22, 5, 180, 3000);
 
 
 
@@ -237,32 +239,44 @@ void takein() {
   }
 }
 
-bool stoppedAt230 = false; // Tracks if the motor has stopped at 230
+bool backpackMoving = false; // Tracks if the backpack is actively moving
 
 void backpack() {
-  if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) { // When R2 is pressed
-    if (rotation.get_angle() > 230 || stoppedAt230) { 
-      hangLeft.move(40);  // Move up
-      hangRight.move(-40); // Move up (reverse)
-      stoppedAt230 = false; // Reset the stop flag
-    } else if (rotation.get_angle() <= 230 && !stoppedAt230) {
-      hangLeft.brake();  // Stop the motors at 230
+  static const int SPEED = 40;         // Motor speed for movement
+  static const double TOLERANCE = 2.0; // Tolerance in degrees for stopping
+  static double targetAngle = 0;      // The target angle for the backpack
+  
+  if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+    targetAngle = 230; // Set target to 230 degrees
+    backpackMoving = true; // Enable movement
+  } 
+  else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+    targetAngle = 360; // Set target to 360 degrees
+    backpackMoving = true; // Enable movement
+  }
+  
+  if (backpackMoving) {
+    double currentAngle = rotation.get_angle(); // Get the current angle
+    double error = targetAngle - currentAngle; // Calculate the error
+
+    if (std::abs(error) > TOLERANCE) { // If the error is outside the tolerance
+      int direction = (error > 0) ? 1 : -1; // Determine motor direction
+      hangLeft.move(SPEED * direction);    // Move motors to reduce error
+      hangRight.move(-SPEED * direction);  // Reverse for opposite side
+    } else { // If the target is reached
+      hangLeft.brake(); // Stop the motors
       hangRight.brake();
-      stoppedAt230 = true; // Set the stop flag
+      backpackMoving = false; // Disable movement
     }
-  } 
-  else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) { // When R1 is pressed
-    hangLeft.move(-40);  // Move down
-    hangRight.move(40);  // Move down (reverse)
-    stoppedAt230 = false; // Reset the stop flag, allowing R2 to work again
-  } 
-  else {
+  } else {
+    // Default behavior: motors are held in position when not moving
     hangRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     hangLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    hangRight.brake(); // Stops the motors
+    hangRight.brake();
     hangLeft.brake();
   }
 }
+
 void setclamp() {
   static bool toggle = false;
   static bool latch = false;
