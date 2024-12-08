@@ -1,6 +1,8 @@
 #include "main.h"
 #include "lemlib/api.hpp" // IWYU pragma: keep
+#include "pros/misc.h"
 #include "pros/misc.hpp"
+#include "pros/motors.h"
 #include "pros/rotation.h"
 #include "pros/rtos.hpp"
 
@@ -76,7 +78,7 @@ lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel
 lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors);
 
 void auton1(){
-	//Left Side red, working?
+	//right Side red, working?
 		static pros::adi::DigitalOut clamp('A');
 		clamp.set_value(false);
 		chassis.setPose(-63, -24, 90);
@@ -106,7 +108,7 @@ void auton1(){
 	chassis.moveToPoint(36, -24, 3000, {.forwards = false, .maxSpeed = 30});
 		pros::delay(1000);
 		clamp.set_value(true);
-		pros::delay(10000);
+		pros::delay(1000);
 		intake.move(127);
 	chassis.moveToPoint(23.465, -47, 3000,{.maxSpeed = 60});
 		pros::delay(1000);
@@ -208,6 +210,39 @@ void initialize() {
     });
 }
 
+/*int auton = 1;
+int noa = 4;
+void autonselector() {
+ if (auton>noa){
+   auton=1;
+ }
+if (auton<1){
+   auton=noa;
+}
+if(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X) > 5){
+   auton++;
+   pros::delay(500);
+}
+if(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X) < -5){
+   auton--;
+   pros::delay(500);
+}
+if(auton == 1){
+  pros::lcd::print(5, "right Red");
+}
+if(auton == 2){
+  pros::lcd::print(5, "left blue");
+
+  }
+if(auton == 3){
+  pros::lcd::print(5, "right blue");
+
+  }  
+if(auton == 4){
+  pros::lcd::print(5, "left red");
+
+  }  
+}*/
 
 /**
  * Runs while the robot is disabled
@@ -226,7 +261,22 @@ ASSET(leftred_txt);
 
 void autonomous() {
 //chassis.follow(leftred_txt, 15, 1500);
-auton3();
+ /* if (auton == 1){
+  auton1();
+  }
+
+  if (auton == 2){
+  auton2();
+  }
+
+  if (auton == 3){
+  auton3();
+  }
+
+   if (auton == 4){
+  auton4();
+  }*/
+  auton3();
 
 }
 void takein() {
@@ -239,41 +289,21 @@ void takein() {
   }
 }
 
-bool backpackMoving = false; // Tracks if the backpack is actively moving
+void backpack(){
 
-void backpack() {
-  static const int SPEED = 40;         // Motor speed for movement
-  static const double TOLERANCE = 2.0; // Tolerance in degrees for stopping
-  static double targetAngle = 0;      // The target angle for the backpack
-  
+  // Check if the DOWN button is pressed
   if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-    targetAngle = 230; // Set target to 230 degrees
-    backpackMoving = true; // Enable movement
-  } 
-  else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-    targetAngle = 360; // Set target to 360 degrees
-    backpackMoving = true; // Enable movement
-  }
-  
-  if (backpackMoving) {
-    double currentAngle = rotation.get_angle(); // Get the current angle
-    double error = targetAngle - currentAngle; // Calculate the error
-
-    if (std::abs(error) > TOLERANCE) { // If the error is outside the tolerance
-      int direction = (error > 0) ? 1 : -1; // Determine motor direction
-      hangLeft.move(SPEED * direction);    // Move motors to reduce error
-      hangRight.move(-SPEED * direction);  // Reverse for opposite side
-    } else { // If the target is reached
-      hangLeft.brake(); // Stop the motors
-      hangRight.brake();
-      backpackMoving = false; // Disable movement
-    }
+    hangLeft.move(50);
+    hangRight.move(-50);
+  } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+    hangRight.move(50);
+    hangLeft.move(-50);
   } else {
-    // Default behavior: motors are held in position when not moving
-    hangRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     hangLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    hangRight.brake();
+        hangRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
     hangLeft.brake();
+    hangRight.brake();
   }
 }
 
@@ -300,12 +330,13 @@ void setclamp() {
  */
 
 void opcontrol() {
-auton4();
+//auton4();
 //pros::delay(10000);
 	//rotation.reset_position();
 	//rotation.reset();
+  
     while (true) {
-
+      //autonselector();
 		backpack();
 		setclamp();
 		takein();

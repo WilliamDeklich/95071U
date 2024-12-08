@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "90571U",
+    "project_name": "right blue",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -298,7 +298,8 @@
       }
     },
     "upload_options": {
-      "description": "V12.2 "
+      "description": "V12.2 ",
+      "slot": 3
     },
     "use_early_access": false
   }
