@@ -166,34 +166,17 @@ chassis.moveToPose(-18, 42, 90, 3000);
 	pros::delay(1000);
 //chassis.moveToPose(-22, 5, 180, 3000);
 
-
-
 }
-//ao9wdeiuhfauwehfg
-//aiuwehgijshwrg
-
+void auton5(){
+//skills
+}
 int arm_state = 0;
 bool enable_pid = false;
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
+
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
-	
 
-    // the default rate is 50. however, if you need to change the rate, you
-    // can do the following.
-    //lemlib::bufferedStdout().setRate(10);
-    // If you use bluetooth or a wired connection, you will want to have a rate of 10ms
-
-    // for more information on how the formatting for the loggers
-    // works, refer to the fmtlib docs
-
-    // thread to for brain screen and position logging
     pros::Task screenTask([&]() {
         while (true) {
             // print robot location to the brain screen
@@ -262,8 +245,8 @@ void initialize() {
 }
 
 
-/*int auton = 1;
-int noa = 4;
+int auton = 1;
+int noa = 5;
 void autonselector() {
  if (auton>noa){
    auton=1;
@@ -292,28 +275,21 @@ if(auton == 3){
   }  
 if(auton == 4){
   pros::lcd::print(5, "left red");
-
   }  
-}*/
+if(auton ==5){
+  pros::lcd::print(5, "skills");
 
-/**
- * Runs while the robot is disabled
- */
+}
+}
+
+
 void disabled() {}
 
-/**
- * runs after initialize if the robot is connected to field control
- */
 void competition_initialize() {}
 
-// get a path used for pure pursuit
-// this needs to be put outside a function
-ASSET(example_txt); // '.' replaced with "_" to make c++ happy
-ASSET(leftred_txt);
 
 void autonomous() {
-//chassis.follow(leftred_txt, 15, 1500);
- /* if (auton == 1){
+  if (auton == 1){
   auton1();
   }
 
@@ -327,8 +303,11 @@ void autonomous() {
 
    if (auton == 4){
   auton4();
-  }*/
-  auton3();
+  }
+
+     if (auton == 5){
+  auton5();
+  }
 
 }
 void takein() {
@@ -378,13 +357,10 @@ void setclamp() {
  */
 
 void opcontrol() {
-//auton4();
-//pros::delay(10000);
-	//rotation.reset_position();
-	//rotation.reset();
+
   
     while (true) {
-      //autonselector();
+    autonselector();
 		arm_control();
 		setclamp();
 		takein();
