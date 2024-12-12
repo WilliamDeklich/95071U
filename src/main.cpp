@@ -172,7 +172,8 @@ chassis.moveToPose(-18, 42, 90, 3000);
 //ao9wdeiuhfauwehfg
 //aiuwehgijshwrg
 
-
+int arm_state = 0;
+bool enable_pid = false;
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -208,7 +209,58 @@ void initialize() {
             pros::delay(50);
         }
     });
+    pros::Task arm_task([&]() { 
+        double angle = 0;
+        int time_settled = 0;
+        double kp = 3; 
+        double kd = 0.5;
+        int maxvolt = 127;
+        double previous_error = 0;
+        while (true) {
+            if (arm_state == 0) {
+                angle = 75;
+            }
+            else if (arm_state == 1) {
+                angle = 101;
+            }
+            else if (arm_state == 2) {
+                angle = 208;
+            }
+
+            double error = angle - rotation.get_angle() / 100.0;
+
+            if (time_settled < 60 && enable_pid) {
+                int speed = kp * error + kd * (error - previous_error);
+                if (speed < -maxvolt) {
+                    speed = -maxvolt;
+                }
+                if (speed > maxvolt) {
+                    speed = maxvolt;
+                }
+                hangLeft.move(speed);
+                hangRight.move(-speed);
+                if (fabs(error) <= 0.2) {
+                    time_settled += 20;
+                }
+                else {
+                    time_settled = 0;
+                }
+
+            } 
+            else {
+                time_settled = 0;
+                hangLeft.brake();
+                hangRight.brake();
+                enable_pid = false;
+            }
+
+            previous_error = error;
+
+            pros::delay(10);
+        }
+});
 }
+
 
 /*int auton = 1;
 int noa = 4;
@@ -289,22 +341,18 @@ void takein() {
   }
 }
 
-void backpack(){
-
-  // Check if the DOWN button is pressed
-  if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-    hangLeft.move(50);
-    hangRight.move(-50);
-  } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-    hangRight.move(50);
-    hangLeft.move(-50);
-  } else {
-    hangLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-        hangRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
-    hangLeft.brake();
-    hangRight.brake();
-  }
+bool button_pressed = false;
+void arm_control() {
+    if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+        if (!button_pressed) {
+            arm_state = (arm_state + 1) % 3;
+            enable_pid = true;
+            button_pressed = true;
+        }
+    }
+    else {
+        button_pressed = false;
+    }
 }
 
 void setclamp() {
@@ -337,7 +385,7 @@ void opcontrol() {
   
     while (true) {
       //autonselector();
-		backpack();
+		arm_control();
 		setclamp();
 		takein();
 
