@@ -120,58 +120,80 @@ void auton1(){
  }
 void auton3(){
 	//Right Side Blue
-		static pros::adi::DigitalOut clamp('A');
-		clamp.set_value(false);
-		chassis.setPose(62, 22, 90);
+	static pros::adi::DigitalOut clamp('A');
+  clamp.set_value(false);
+  chassis.setPose(55,15,90);
+chassis.moveToPose(55, 15, 90, 2500);
+chassis.moveToPose(60, 10, 140, 2500);
+  pros::delay(2000);
+  hangLeft.move(-80);
+  hangRight.move(80);
+  pros::delay(1000);
+  hangLeft.move(80);
+  hangRight.move(-80);
+  pros::delay(1000);
+  hangRight.brake();
+  hangLeft.brake();
+chassis.moveToPose(47, 23, 135,  2500, {.forwards = false});
+chassis.moveToPose(27, 23,90,  2500,{.forwards = false});
+	pros::delay(2000);
+  clamp.set_value(true);
+  pros::delay(1000);
+  intake.move(127);
+chassis.moveToPose(23, 35,0,  2500);
+chassis.moveToPose(23, 49,0,  2500);
+chassis.moveToPose(16, 51,270,  2500);
+chassis.moveToPose(8, 51,270,  2500);
+  pros::delay(4000);
+chassis.moveToPose(14, 46,270,  2500,{.forwards = false});
+chassis.moveToPose(7, 41,270,  2500);
+  pros::delay(2500);
+chassis.moveToPose(24, 8,180,  2500);
+  pros::delay(3000);
+  intake.brake();
 
-	chassis.moveToPose(62, 22, 90, 3000);
-	chassis.moveToPose(31.945, 24.021, 90, 3000, {.forwards = false, .maxSpeed= 50});
-	chassis.moveToPose(23.788, 46.956, 0, 3000);
-	clamp.set_value(true);
-	intake.move(127);
-	pros::delay(1000);
-	chassis.moveToPose(8.04, 50.51, 270, 3000);
-	intake.move(-127);
-	pros::delay(500);
-	intake.move(127);
-	chassis.moveToPose(17.893, 45.503, 270, 3000 , {.forwards = false});
-	intake.move(127);
-	chassis.moveToPose(8.04, 42.272, 270, 3000);
-	intake.move(127);
-	pros::delay(1000);
-	chassis.moveToPose(22.577, 4.962, 180, 3000);
 }
 void auton4(){
-	//left Side Red
-  chassis.setPose(-62, 22, 270);
-
-		static pros::adi::DigitalOut clamp('A');
-    clamp.set_value(false);
-chassis.moveToPose(-62, 22, 270, 3000);
-chassis.moveToPose(-32, 24, 270, 3000, {.forwards = false, .maxSpeed= 50});
-	pros::delay(1000);
-	intake.move(127);	
-  clamp.set_value(true);
-chassis.moveToPose(-35, 47, 0, 3000);
-	intake.move(127);
-	pros::delay(1000);
-chassis.moveToPose(-18, 53, 90, 3000);
-	pros::delay(500);
-	intake.move(127);
+//left Side Red (Negative)
+	static pros::adi::DigitalOut clamp('A');
+  clamp.set_value(false);
+  chassis.setPose(-55,15,270);
+chassis.moveToPose(-55, 15, 270, 2500);
+chassis.moveToPose(-60, 10, 220, 2500);
+  pros::delay(2000);
+  hangLeft.move(-80);
+  hangRight.move(80);
   pros::delay(1000);
-chassis.moveToPose(-30, 53, 90, 3000, {.forwards = false});
-	intake.move(127);
-chassis.moveToPose(-18, 42, 90, 3000);
-	intake.move(127);
-	pros::delay(1000);
-//chassis.moveToPose(-22, 5, 180, 3000);
+  hangLeft.move(80);
+  hangRight.move(-80);
+  pros::delay(1000);
+  hangRight.brake();
+  hangLeft.brake();
+chassis.moveToPose(-47, 23, 225,  2500, {.forwards = false});
+chassis.moveToPose(-27, 23,270,  2500,{.forwards = false});
+	pros::delay(2000);
+  clamp.set_value(true);
+  pros::delay(1000);
+  intake.move(127);
+chassis.moveToPose(-23, 35,0,  2500);
+chassis.moveToPose(-23, 49,0,  2500);
+chassis.moveToPose(-16, 51,90,  2500);
+chassis.moveToPose(-8, 51,90,  2500);
+  pros::delay(4000);
+chassis.moveToPose(-14, 46,90,  2500,{.forwards = false});
+chassis.moveToPose(-7, 41,90,  2500);
+  pros::delay(2500);
+chassis.moveToPose(-24, 8,180,  2500);
+  pros::delay(3000);
+  intake.brake();
+
 
 }
 void auton5(){
 //skills
 }
-int arm_state = 0;
-bool enable_pid = false;
+//int arm_state = 0;
+//bool enable_pid = false;
 
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
@@ -192,8 +214,8 @@ void initialize() {
             pros::delay(50);
         }
     });
-    pros::Task arm_task([&]() { 
-        double angle = 0;
+    //pros::Task arm_task([&]() { 
+        /*double angle = 0;
         int time_settled = 0;
         double kp = 3; 
         double kd = 0.5;
@@ -239,10 +261,10 @@ void initialize() {
 
             previous_error = error;
 
-            pros::delay(10);
-        }
-});
-}
+            pros::delay(10);*/
+        //}
+}//);
+//}
 
 
 int auton = 1;
@@ -285,7 +307,10 @@ if(auton ==5){
 
 void disabled() {}
 
-void competition_initialize() {}
+void competition_initialize() {
+    autonselector();
+
+}
 
 
 void autonomous() {
@@ -321,8 +346,8 @@ void takein() {
 }
 
 bool button_pressed = false;
-void arm_control() {
-    if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+/*void arm_control() {
+    if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
         if (!button_pressed) {
             arm_state = (arm_state + 1) % 3;
             enable_pid = true;
@@ -332,7 +357,7 @@ void arm_control() {
     else {
         button_pressed = false;
     }
-}
+}*/
 
 void setclamp() {
   static bool toggle = false;
@@ -357,11 +382,10 @@ void setclamp() {
  */
 
 void opcontrol() {
-
+auton3();
   
     while (true) {
-    autonselector();
-		arm_control();
+		//arm_control();
 		setclamp();
 		takein();
 
