@@ -16,12 +16,14 @@ pros::MotorGroup rightMotors({14,15,16}, pros::MotorGearset::blue); // right mot
 
 // Inertial Sensor on port 10
 pros::Imu imu(1);
-pros::Rotation rotation(2);
+pros::Rotation rotation_sensor(-20);
 // motor configs
 pros::Motor intake(9);
 pros::Controller controller1();
 pros::Motor hangLeft(7);
 pros::Motor hangRight(8);
+lemlib::TrackingWheel horizontal_tracking_wheel(&rotation_sensor, lemlib::Omniwheel::NEW_2, 0);
+
 // tracking wheels
 // horizontal tracking wheel encoder. Rotation sensor, port 20, not reversed
 //pros::Rotation horizontalEnc(20);
@@ -68,7 +70,7 @@ lemlib::ControllerSettings angularController(2, // proportional gain (kP)
 // sensors for odometry
 lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel
                             nullptr, // vertical tracking wheel 2, set to nullptr as we don't have a second one
-                            nullptr, // horizontal tracking wheel
+                            &horizontal_tracking_wheel, // horizontal tracking wheel
                             nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
                             &imu // inertial sensor
 );
@@ -99,24 +101,27 @@ void auton1(){
 }
 
  void auton2(){
-	//Left Side Blue, working?
-		static pros::adi::DigitalOut clamp('A');
-		clamp.set_value(false);
-		chassis.setPose(63, -24, 90);
-	chassis.moveToPoint(63, -24, 3000, {.forwards = false, .maxSpeed = 60});
-	chassis.moveToPoint(45, -24, 3000, {.forwards = false, .maxSpeed = 60});
-	chassis.moveToPoint(36, -24, 3000, {.forwards = false, .maxSpeed = 30});
-		pros::delay(1000);
-		clamp.set_value(true);
-		pros::delay(1000);
-		intake.move(127);
-	chassis.moveToPoint(23.465, -47, 3000,{.maxSpeed = 60});
-		pros::delay(1000);
-		intake.move(127);
-	chassis.moveToPoint(60, -47, 3000,{.maxSpeed = 60});
-		intake.move(127);
-		pros::delay(10000);
-		intake.brake();
+	//Right Side Blue (Goal Rush)
+  static pros::adi::DigitalOut clamp('A');
+  chassis.setPose(-56,15,270);
+chassis.moveToPose(-56, 15, 250, 2000, {.forwards = false});
+chassis.moveToPose(-33, 23, 270, 2000, {.forwards = false});
+chassis.moveToPose(-23, 23, 270, 2000, {.forwards = false});
+  clamp.set_value(true);
+chassis.moveToPose(-8, 37, 45,  2000);
+  clamp.set_value(true);
+  intake.move(127);
+chassis.moveToPose(-19, 44, 315, 2000);
+  clamp.set_value(true);
+  intake.move(127);
+chassis.moveToPose(-28, 48, 90, 2000);
+  clamp.set_value(true);
+  intake.move(127);
+chassis.moveToPose(-9, 50, 90, 2000);
+  clamp.set_value(true);
+  intake.move(127);
+  pros::delay(5000);
+
  }
 void auton3(){
 	//Right Side Blue
@@ -204,10 +209,9 @@ void initialize() {
             // print robot location to the brain screen
             pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
             pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-			rotation.set_position(0);
-    		pros::lcd::print(3, "HighStake: %f", (rotation.get_angle()/100));
-			                
+            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading    
+			      pros::lcd::print(1, "Rotation Sensor: %i", rotation_sensor.get_position());
+        pros::delay(10);          
             // log position telemetry
             lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
             // delay to save resources
@@ -344,7 +348,87 @@ void takein() {
     intake.brake(); // Stops the intake motor
   }
 }
+void skib(){
+  static bool toggle = false;
+  static bool latch = false;
+  if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
+      toggle = true;
+      //latch = true;
+    }
+    
 
+  
+  if (toggle){
+    hangLeft.move(-127);
+    hangRight.move(127);
+    pros::delay(150);
+    hangLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    hangRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    hangLeft.brake();
+    hangRight.brake();
+
+    toggle = false;
+  }
+
+}
+
+//bool button_pressed = false;
+void backpack(){
+
+
+  // Check if the DOWN button is pressed
+  if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+    hangLeft.move(50);
+    hangRight.move(-50);
+  } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+    hangRight.move(50);
+    hangLeft.move(-50);
+  } else {
+    hangLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+        hangRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+
+    hangLeft.brake();
+    hangRight.brake();
+  }
+
+}
+void doinker2(){
+  static bool toggle = false;
+  static bool latch = false;
+  if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+    if (!latch) {
+      toggle = !toggle; // Toggle the state
+      latch = true;     // Latch to prevent multiple toggles
+    }
+  } else {
+    latch = false;       // Reset latch when button is released
+  }
+
+
+  // Use the new DigitalOut API to control the clamp
+  static pros::adi::DigitalOut doinker2('C'); // Replace 'A' with your actual digital port
+  doinker2.set_value(toggle);
+}
+
+void doinker(){
+  static bool toggle = false;
+  static bool latch = false;
+  if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+    if (!latch) {
+      toggle = !toggle; // Toggle the state
+      latch = true;     // Latch to prevent multiple toggles
+    }
+  } else {
+    latch = false;       // Reset latch when button is released
+  }
+
+
+  // Use the new DigitalOut API to control the clamp
+  static pros::adi::DigitalOut doinker('B'); // Replace 'A' with your actual digital port
+  doinker.set_value(toggle);
+
+}
 bool button_pressed = false;
 /*void arm_control() {
     if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
@@ -382,13 +466,16 @@ void setclamp() {
  */
 
 void opcontrol() {
-auton3();
+//auton2();
   
     while (true) {
 		//arm_control();
 		setclamp();
 		takein();
-
+    doinker();
+    doinker2();
+    skib();
+    backpack();
  		int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightY = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
