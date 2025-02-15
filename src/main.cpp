@@ -10,18 +10,18 @@
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // motor groups
-pros::MotorGroup leftMotors({-11,-12,-13},
+pros::MotorGroup leftMotors({-17,-12,-13},
                             pros::MotorGearset::blue); // left motor group - ports 3 (reversed), 4, 5 (reversed)
-pros::MotorGroup rightMotors({14,15,16}, pros::MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
+pros::MotorGroup rightMotors({14,15,11}, pros::MotorGearset::blue); // right motor group - ports 6, 7, 9 (reversed)
 
 // Inertial Sensor on port 10
-pros::Imu imu(1);
-pros::Rotation rotation_sensor(-20);
+pros::Imu imu(3);
+pros::Rotation rotation_sensor(20);
 // motor configs
 pros::Motor intake(9);
 pros::Controller controller1();
 pros::Motor hangLeft(7);
-pros::Motor hangRight(8);
+pros::Motor intake2(-16);
 lemlib::TrackingWheel horizontal_tracking_wheel(&rotation_sensor, lemlib::Omniwheel::NEW_2, 0);
 
 // tracking wheels
@@ -80,123 +80,242 @@ lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel
 lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors);
 
 void auton1(){
-	//right Side red, working?
+	//right Side red (Goal Rush)
 		static pros::adi::DigitalOut clamp('A');
 		clamp.set_value(false);
-		chassis.setPose(-63, -24, 90);
-	chassis.moveToPoint(-63, -24, 3000, {.forwards = false, .maxSpeed = 60});
-	chassis.moveToPoint(-45, -24, 3000, {.forwards = false, .maxSpeed = 60});
-	chassis.moveToPoint(-36, -24, 3000, {.forwards = false, .maxSpeed = 30});
-		pros::delay(1000);
-		clamp.set_value(true);
-		pros::delay(10000);
-		intake.move(127);
-	chassis.moveToPoint(-23.465, -47, 3000,{.maxSpeed = 60});
-		pros::delay(1000);
-		intake.move(127);
-	chassis.moveToPoint(-60, -47, 3000,{.maxSpeed = 60});
-		intake.move(127);
-		pros::delay(10000);
-		intake.brake();
+    chassis.setPose(-55,-15, 90);
+		chassis.moveToPose(-55, -15, 90, 2000);
+chassis.moveToPose(-28.22, -43.009, 135, 2000);
+chassis.moveToPose(-23.052, -53,90, 2000);
+chassis.moveToPose(-15.784, -53,90, 2000);
+chassis.moveToPose(-39.365, -53.185, 90, 2000);
+chassis.moveToPose(-32.42, -49.308, 270, 2000);
+chassis.moveToPose(-51.479, -47.37, 277, 2000);
+
 }
 
  void auton2(){
-	//Right Side Blue (Goal Rush)
+	//left Side red (4 Stack Rush)
   static pros::adi::DigitalOut clamp('A');
   chassis.setPose(-56,15,270);
-chassis.moveToPose(-56, 15, 250, 2000, {.forwards = false});
+//chassis.moveToPose(-56, 15, 250, 2000, {.forwards = false});
 chassis.moveToPose(-33, 23, 270, 2000, {.forwards = false});
 chassis.moveToPose(-23, 23, 270, 2000, {.forwards = false});
   clamp.set_value(true);
-chassis.moveToPose(-8, 37, 45,  2000);
+chassis.moveToPose(-12, 40, 45,  2000);
   clamp.set_value(true);
   intake.move(127);
+    intake2.move(127);
+
 chassis.moveToPose(-19, 44, 315, 2000);
   clamp.set_value(true);
   intake.move(127);
+    intake2.move(127);
+
 chassis.moveToPose(-28, 48, 90, 2000);
   clamp.set_value(true);
   intake.move(127);
-chassis.moveToPose(-9, 50, 90, 2000);
+    intake2.move(127);
+
+chassis.moveToPose(-12, 50, 90, 2000);
   clamp.set_value(true);
   intake.move(127);
-  pros::delay(5000);
+    intake2.move(127);
 
+  pros::delay(2000);
+chassis.moveToPose(-23.698, 3.993, 180, 2000);
  }
 void auton3(){
-	//Right Side Blue
+	//Right Side Blue (4 stack Rush alliance stake)
 	static pros::adi::DigitalOut clamp('A');
   clamp.set_value(false);
   chassis.setPose(55,15,90);
-chassis.moveToPose(55, 15, 90, 2500);
-chassis.moveToPose(60, 10, 140, 2500);
-  pros::delay(2000);
+chassis.moveToPose(55, 15, 90, 1500);
+chassis.moveToPose(60, 9, 135, 1500);
+  pros::delay(1000);
   hangLeft.move(-80);
-  hangRight.move(80);
+  
   pros::delay(1000);
   hangLeft.move(80);
-  hangRight.move(-80);
+
   pros::delay(1000);
-  hangRight.brake();
+
   hangLeft.brake();
-chassis.moveToPose(47, 23, 135,  2500, {.forwards = false});
-chassis.moveToPose(27, 23,90,  2500,{.forwards = false});
+chassis.moveToPose(47, 23, 135,  1500, {.forwards = false, .minSpeed = 70});
+chassis.moveToPose(27, 23,90,  1500,{.forwards = false});
 	pros::delay(2000);
   clamp.set_value(true);
   pros::delay(1000);
   intake.move(127);
-chassis.moveToPose(23, 35,0,  2500);
-chassis.moveToPose(23, 49,0,  2500);
-chassis.moveToPose(16, 51,270,  2500);
-chassis.moveToPose(8, 51,270,  2500);
-  pros::delay(4000);
-chassis.moveToPose(14, 46,270,  2500,{.forwards = false});
-chassis.moveToPose(7, 41,270,  2500);
-  pros::delay(2500);
-chassis.moveToPose(24, 8,180,  2500);
-  pros::delay(3000);
+  intake2.move(127);
+
+chassis.moveToPose(23, 35,0,  1500,{.minSpeed = 80});
+chassis.moveToPose(23, 49,0,  1500);
+chassis.moveToPose(16, 51,270,  1500);
+chassis.moveToPose(10, 51,270,  1500);
+  pros::delay(2000);
+chassis.moveToPose(14, 46,270,  1500,{.forwards = false});
+chassis.moveToPose(10, 41,270,  1500);
+  pros::delay(1500);
+chassis.moveToPose(24, 8,180,  1500);
+  pros::delay(1500);
+  intake.brake();
   intake.brake();
 
 }
 void auton4(){
-//left Side Red (Negative)
+//left Side blue (goalrush)
 	static pros::adi::DigitalOut clamp('A');
+  static pros::adi::DigitalOut doinker('B');
+  static pros::adi::DigitalOut doinker2('C');
+  chassis.setPose(59.205, -36.283, 270);
+chassis.moveToPose(17.804, -39.126, 265, 1500, {.minSpeed = 80});
+doinker.set_value(true);
+chassis.moveToPose(49.4, -61.9, 90, 1500);
+doinker2.set_value(true);
+
+pros::delay(100);
+chassis.moveToPose(23.668, -38.949, 180,  1500, {.forwards = false});
+doinker2.set_value(false);
+pros::delay(1500);
+doinker.set_value(false);
+intake.move(127);
+intake2.move(127);
+chassis.moveToPose(30.775, -35.573, 180, 1500, {.forwards = false});
+pros::delay(1500);
+}
+/*void auton5(){
+   chassis.setPose(-53, 0, 270);
+  static pros::adi::DigitalOut clamp('A');
   clamp.set_value(false);
-  chassis.setPose(-55,15,270);
-chassis.moveToPose(-55, 15, 270, 2500);
-chassis.moveToPose(-60, 10, 220, 2500);
-  pros::delay(2000);
-  hangLeft.move(-80);
-  hangRight.move(80);
-  pros::delay(1000);
-  hangLeft.move(80);
-  hangRight.move(-80);
-  pros::delay(1000);
-  hangRight.brake();
-  hangLeft.brake();
-chassis.moveToPose(-47, 23, 225,  2500, {.forwards = false});
-chassis.moveToPose(-27, 23,270,  2500,{.forwards = false});
-	pros::delay(2000);
+  hangLeft.move(-127);
+ 
+  hangRight.move(127);
+  pros::delay(700);
+  chassis.moveToPoint(-47, 0, 3000, {.forwards = false});
+   
+  pros::delay(200);
+  hangLeft.move(127);
+  hangRight.move(-127);
+  pros::delay(500);
+
+*/
+
+
+/*
+
+ chassis.turnToPoint(-47, 23.5, 3000, {.maxSpeed = 60});
+  chassis.moveToPoint(-49, -26.5, 3000, {.forwards = false, .maxSpeed = 60});
+  pros::delay(700);
   clamp.set_value(true);
-  pros::delay(1000);
+  pros::delay(600);
   intake.move(127);
-chassis.moveToPose(-23, 35,0,  2500);
-chassis.moveToPose(-23, 49,0,  2500);
-chassis.moveToPose(-16, 51,90,  2500);
-chassis.moveToPose(-8, 51,90,  2500);
-  pros::delay(4000);
-chassis.moveToPose(-14, 46,90,  2500,{.forwards = false});
-chassis.moveToPose(-7, 41,90,  2500);
-  pros::delay(2500);
-chassis.moveToPose(-24, 8,180,  2500);
-  pros::delay(3000);
-  intake.brake();
+  //pros::delay(100);
+  chassis.turnToPoint(-23.5, -23.5, 3000);
+  chassis.moveToPoint(-23.5, -26.5, 3000);
+  //pros::delay(600);
+  chassis.turnToPoint(0, -59, 3000);
+  chassis.moveToPoint(-4, -59, 3000);
+  //pros::delay(700);
+  //chassis.turnToPoint(-23.5, -52, 3000);
+  chassis.moveToPoint(-23.5, -52, 3000);
+ // pros::delay(600);
+  chassis.moveToPoint(-47, -50, 3000, {.maxSpeed = 50});
+  pros::delay(1000);
+  chassis.moveToPoint(-58.5, -48.5, 3000, {.maxSpeed = 50});
 
 
-}
-void auton5(){
-//skills
-}
+  pros::delay(1000);
+  chassis.turnToPoint(-47, -60, 3000);
+  chassis.moveToPoint(-40, -67, 3000, {.maxSpeed = 80});
+  pros::delay(1000);
+  chassis.turnToPoint(-23.5, -47, 3000);
+   //clamp.set_value(false);
+   //pros::delay(200);
+  chassis.moveToPoint(-70, -70, 3000, {.forwards = false, .maxSpeed = 60});
+
+
+ 
+  pros::delay(200);
+  clamp.set_value(false);
+  chassis.moveToPoint(-47, -47, 3000);
+  chassis.turnToPoint(-47, 23.5, 3000);
+  pros::delay(100);
+  chassis.moveToPoint(-47, 0, 3000);
+  chassis.turnToPoint(-47, -23.5, 3000);
+ // pros::delay(300);
+  chassis.moveToPoint(-47, 27.5, 3000, {.forwards= false, .maxSpeed = 80});
+  pros::delay(800);
+  clamp.set_value(true);
+  pros::delay(200);
+  intake.move(127);
+  pros::delay(100);
+  chassis.turnToPoint(-23.5, 23.5, 3000);
+  chassis.moveToPoint(-21, 30, 3000);
+  //pros::delay(500);
+  chassis.turnToPoint(3, 59, 3000);
+  chassis.moveToPoint(0, 64, 3000);
+  //pros::delay(700);
+  //chassis.turnToPoint(-23.5, 47, 3000);
+  chassis.moveToPoint(-23.5, 55, 3000);
+  //pros::delay(200);
+  chassis.moveToPoint(-47.5, 53.5, 3000, {.maxSpeed = 50});
+  pros::delay(1000);
+  chassis.moveToPoint(-59.5, 49.5, 3000, {.maxSpeed = 50});
+
+
+
+
+  pros::delay(1000);
+  chassis.turnToPoint(-49, 65, 3000);
+  chassis.moveToPoint(-49, 60, 3000, {.maxSpeed = 70});
+  pros::delay(1000);
+  chassis.turnToPoint(-23.5, 47, 3000);
+  chassis.moveToPoint(-68, 70, 3000, {.forwards = false});
+  clamp.set_value(false);
+  chassis.moveToPoint(-23.5, 47, 3000, {.maxSpeed = 80});
+  pros::delay(200);
+  chassis.moveToPoint(23.5, 55, 3000, {.maxSpeed = 80});
+  pros::delay(500);
+  chassis.moveToPoint(47, -3, 3000, {.forwards= false, .maxSpeed = 100});
+  pros::delay(300);
+  clamp.set_value(true);
+  /* *
+  chassis.moveToPoint(23.5, 23.5, 3000, {.forwards = false});
+  chassis.moveToPoint(47, 0, 3000);
+  chassis.moveToPoint(23.5, -23.5, 3000);
+  chassis.moveToPoint(23.5, -47, 3000);
+  pros::delay(500);
+  chassis.turnToPoint(47, -47, 3000, {.maxSpeed = 60});
+  chassis.moveToPoint(47, -47, 3000, {.maxSpeed = 60});
+  pros::delay(700);
+  chassis.moveToPoint(47, -60, 3000, {.maxSpeed = 60});
+  pros::delay(1000);
+  chassis.turnToPoint(23.5, -47, 3000);
+  chassis.moveToPoint(70, -70, 3000);
+  clamp.set_value(false);
+  chassis.moveToPoint(23.5, -47, 3000);
+  chassis.turnToPoint(0, -70, 3000);
+  chassis.moveToPoint(60, 23.5, 3000, {.forwards = false, .maxSpeed = 100});
+  chassis.moveToPoint(70, 70, 3000, {.forwards = false});
+  clamp.set_value(false);
+  pros::delay(10000);
+  
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+  pros::delay(1000000);
+}*/
 //int arm_state = 0;
 //bool enable_pid = false;
 
@@ -210,7 +329,8 @@ void initialize() {
             pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
             pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
             pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading    
-			      pros::lcd::print(1, "Rotation Sensor: %i", rotation_sensor.get_position());
+			      pros::lcd::print(3, "Rotation Sensor: %i", rotation_sensor.get_position());
+            pros::lcd::print(4, "Hang Sensor: %i", hangLeft.get_position());
         pros::delay(10);          
             // log position telemetry
             lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
@@ -312,40 +432,28 @@ if(auton ==5){
 void disabled() {}
 
 void competition_initialize() {
-    autonselector();
 
 }
 
 
 void autonomous() {
-  if (auton == 1){
-  auton1();
-  }
-
-  if (auton == 2){
-  auton2();
-  }
-
-  if (auton == 3){
+  
   auton3();
-  }
-
-   if (auton == 4){
-  auton4();
-  }
-
-     if (auton == 5){
-  auton5();
-  }
 
 }
 void takein() {
   if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) { // in
     intake.move(127); // Spins the intake motor forward at full speed
+      intake2.move(127);
+
   } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) { // out
     intake.move(-127); // Spins the intake motor reverse at full speed
+      intake2.move(-127);
+
   } else {
     intake.brake(); // Stops the intake motor
+      intake2.brake();
+
   }
 }
 void skib(){
@@ -360,12 +468,12 @@ void skib(){
   
   if (toggle){
     hangLeft.move(-127);
-    hangRight.move(127);
-    pros::delay(150);
+
+    pros::delay(170);
     hangLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    hangRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
     hangLeft.brake();
-    hangRight.brake();
+
 
     toggle = false;
   }
@@ -378,21 +486,22 @@ void backpack(){
 
   // Check if the DOWN button is pressed
   if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-    hangLeft.move(50);
-    hangRight.move(-50);
+    hangLeft.move(120);
+
   } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-    hangRight.move(50);
-    hangLeft.move(-50);
+
+    hangLeft.move(-120);
   } else {
     hangLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-        hangRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
 
 
     hangLeft.brake();
-    hangRight.brake();
+
   }
 
 }
+
 void doinker2(){
   static bool toggle = false;
   static bool latch = false;
@@ -444,7 +553,7 @@ bool button_pressed = false;
 }*/
 
 void setclamp() {
-  static bool toggle = false;
+  static bool toggle = true;
   static bool latch = false;
 
   // Check if the DOWN button is pressed
@@ -466,8 +575,8 @@ void setclamp() {
  */
 
 void opcontrol() {
-//auton2();
-  
+
+  //auton2();
     while (true) {
 		//arm_control();
 		setclamp();
